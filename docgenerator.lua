@@ -24,6 +24,66 @@ local lddextractor = require 'lddextractor'
 local M = {}
 M.defaultsitemainpagename = 'index'
 
+function M.generatellsdefinitionsforfiles(filenames, noheuristic)
+  if not filenames then return nil, 'No files provided.' end
+
+  for name, def in pairs( require 'template.lls.utils' ) do
+    templateengine.env [ name ] = def
+  end
+
+  --
+  -- Generate API model elements for all files
+  --
+  local generatedfiles = {}
+  local wrongfiles = {}
+  for _, filename in pairs( filenames ) do
+    -- Load file content
+    print(filename)
+    local file, error = io.open(filename, 'r')
+    if not file then return nil, 'Unable to read "'..filename..'"\n'..err end
+    local code = file:read('*all')
+    file:close()
+    -- Get module for current file
+    local apimodule, err = lddextractor.generateapimodule(filename, code,noheuristic,generatedfiles)
+
+    -- Handle modules with module name
+    if  apimodule and apimodule.name then
+      generatedfiles[ apimodule.name ] = apimodule
+    elseif not apimodule then
+      -- Track faulty files
+      table.insert(wrongfiles, 'Unable to extract comments from "'..filename..'".\n'..err)
+    elseif not apimodule.name then
+      -- Do not generate documentation for unnamed modules
+      table.insert(wrongfiles, 'Unable to create documentation for "'..filename..'", no module name provided.')
+    end
+  end
+
+  --
+  -- Define page cursor
+  --
+  local page = {
+    modules = generatedfiles,
+    tag = 'page'
+  }
+
+  for FileName, File in pairs( templateengine.env [ "anchortypes" ] ) do
+    print ( FileName )
+  end
+
+  --
+  -- Iterate over modules, generating complete doc pages
+  --
+  for _, module in pairs( generatedfiles ) do
+    -- Update current cursor page
+    page.currentmodule = module
+    -- Generate page
+    local content, error = templateengine.applytemplate(page, nil, "lls")
+    if not content then return nil, error end
+    module.body = content
+  end
+  return generatedfiles, wrongfiles
+end
+
 function M.generatedocforfiles(filenames, cssname,noheuristic)
   if not filenames then return nil, 'No files provided.' end
   --

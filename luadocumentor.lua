@@ -27,6 +27,7 @@ local help = [[luadocumentor v0.1.4: tool for Lua Documentation Language
 	-f, --format (default doc) Define output format :
 		* doc: Will produce HTML documentation from specified file(s) or directories.
 		* api: Will produce API file(s) from specified file(s) or directories.
+    * lls: Will produce lua-language-server definition file(s) from specified file(s) or directories
 	-d, --dir (default docs) Define an output directory. If the given directory doesn't exist, it will be created.
 	-h, --help Display the help.
 	-n, --noheuristic Do not use code analysis, use only comments to generate documentation.
@@ -74,6 +75,46 @@ end
 local filestoparse, error = fs.filelist( args )
 if not filestoparse then
   print ( error )
+  return
+end
+
+--
+-- Generate lua-language-server definition files only
+--    https://github.com/luals/lua-language-server
+--    https://luals.github.io/wiki/annotations/
+--
+if args.format == "lls" then
+  local parsedfiles, unparsed = docgenerator.generatellsdefinitionsforfiles(filestoparse,args.noheuristic)
+
+  -- Show warnings on unparsed files
+  if #unparsed > 0 then
+    for _, faultyfile in ipairs( unparsed ) do
+      print( faultyfile )
+    end
+  end
+  -- This loop is just for counting parsed files
+  -- TODO: Find a more elegant way to do it
+  local parsedfilescount = 0
+  for _, p in pairs(parsedfiles) do
+    parsedfilescount = parsedfilescount + 1
+  end
+  print (parsedfilescount .. ' file(s) parsed.')
+  
+  -- Create lua files
+  local generated = 0
+  for _, apifile in pairs ( parsedfiles ) do
+    local status, err = fs.fill(args.dir..fs.separator..apifile.name..'.lua', apifile.body)
+    if status then
+      generated = generated + 1
+    else
+      print( 'Unable to create '..apifile.name..'.lua on disk.')
+    end
+  end
+  print (generated .. ' file(s) generated.')
+
+
+
+  print("Done: LLS")
   return
 end
 

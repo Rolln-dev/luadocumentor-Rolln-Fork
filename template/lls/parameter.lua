@@ -1,9 +1,21 @@
 return[[
-# if _parameter.type and _parameter.type.tag ~= "inlinetyperef" then
----@param $(_parameter.name) $(_parameter.type.typename) $(_parameter.description:gsub("\n", " "))
-# elseif _parameter.type and _parameter.type.def then
----@param $(_parameter.name) $(_parameter.type.def.name) $(_parameter.description:gsub("\n", " "))
+# function isOptional(text)
+#   return text:lower():find("%(optional%)") ~= nil
+# end
+# 
+# local typeEntry = ""
+#
+# if _parameter.type and _parameter.type.typename ~= "" and not _parameter.type.def then
+#   typeEntry = _parameter.type.typename
+# elseif _parameter.type and _parameter.type.def and _parameter.type.def.name ~= "" then
+#   typeEntry = _parameter.type.def.name
 # else
----@param $(_parameter.name) NOTYPE $(_parameter.description:gsub("\n", " "))
+#   typeEntry = "NOTYPE"
+# end
+#
+# if isOptional(_parameter.description) then
+---@param $(_parameter.name)? $(typeEntry) $(_parameter.description:gsub("\n", " "))
+# else
+---@param $(_parameter.name) $(typeEntry) $(_parameter.description:gsub("\n", " "))
 # end
 ]]

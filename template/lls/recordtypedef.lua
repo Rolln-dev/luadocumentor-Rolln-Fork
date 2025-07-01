@@ -33,7 +33,7 @@ $( format( _recordtypedef.description ) )
 #    for name, item in sortedpairs(_recordtypedef.fields) do
 #       if item.type then
 #           local typedef = item:resolvetype()
-#           if not typedef or (typedef.tag ~= 'functiontypedef' and typedef.tag ~= "internaltyperef" and typedef.tag ~= "recordtypedef") then
+#           if not typedef or typedef.tag ~= 'functiontypedef' then
 $(removeTrailingBlankLine(applytemplate(item, i+1, "lls")))
 #           end
 #       end
@@ -47,6 +47,12 @@ $(_recordtypedef.name) = {}
 #           local typedef = item:resolvetype()
 #           if typedef and typedef.tag == 'functiontypedef' then
 $(removeTrailingBlankLine(applytemplate(item, i+1, "lls")))
+# --
+# -- Is function private?
+# --
+# if startsWithLower(item.name) then
+---@private
+# end
 function $(removeBackslashes(prettyname(item))) end
 
 #           end

@@ -2,7 +2,7 @@ return [[#
 # local fdef = _functiontypedef
 # local ignorefirstparam = templateparams[1]
 # local ignoredescription = templateparams[2]
-# local originallink = templateparams[3]
+# -- local originallink = templateparams[3]
 # --
 # -- Function Descriptions
 # --

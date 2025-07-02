@@ -1,9 +1,9 @@
 return[[
-# local typeName = ""
+# local typeName = "NOTYPE"
 # for _, type in pairs(_return.types) do
-#   if type.typename then
+#   if type.typename and type.typeName ~= "" then
 #       typeName = type.typename
-#   elseif type.def then
+#   elseif type.def and type.def.name ~= "" then
 #       typeName = type.def.name
 #   end
 # end

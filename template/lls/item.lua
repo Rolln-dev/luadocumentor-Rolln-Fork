@@ -24,7 +24,7 @@ return [[#
 ---@field $(priv)$(_item.name) $(typeName)$(_item.shortdescription)
 # end
 # if typedef and typedef.tag == "functiontypedef" then
-$(removeTrailingBlankLine(applytemplate(typedef, i+1, "lls")))
+$(removeTrailingBlankLine(applytemplate(typedef, i+1, "lls", true)))
 # end
 #
 ]]
